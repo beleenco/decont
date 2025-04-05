@@ -29,7 +29,7 @@ done
 
 # TODO: run cutadapt for all merged files
 # cutadapt -m 18 -a TGGAATTCTCGGGTGCCAAGG --discard-untrimmed \
-#     -o <trimmed_file> <input_file> > <log_file>  -> Belen 2025-04-02 22:24
+#     -o <trimmed_file> <input_file> > <log_file>  
 echo "Running cutadapt..."
 mkdir -p log/cutadapt
 mkdir -p out/cutadapt
@@ -59,3 +59,14 @@ done
 # - cutadapt: Reads with adapters and total basepairs
 # - star: Percentages of uniquely mapped reads, reads mapped to multiple loci, and to too many loci
 # tip: use grep to filter the lines you're interested in
+
+echo -e "This is the log file of cutadapt and STAR for each run" > Log.out
+
+for fname in out/trimmed/*.fastq.gz
+do
+    sid=$(basename ${fname} _trimmed.fastq.gz)
+    echo $sid >> Log.out
+    grep -E "Reads with adapters|Total basepairs processed" log/cutadapt/${sid}.log >> Log.out
+    grep -E "Uniquely mapped reads %|% of reads mapped to multiple loci|% of reads mapped to too many loci" \
+    out/star/${sid}/Log.final.out  >> Log.out
+done
