@@ -34,11 +34,11 @@ then
         gunzip -k ${dir}/${filename}
     fi
 
-    # Filter sequences based on word in header (if $4 is provided)
     if [ -n "$4" ]; then
-        gunzip -c ${file} | more | "/$4/{N;d;}" > "${filename%.fastq.gz}filtered.fastq.gz"
-        
+        gunzip -c ${dir}/${filename} | sed "/${4}/{N;d;}" > ${dir}/${filename}
     fi
+
+
 
 else
     echo "Error: this script should be run with 2 or more arguments"
