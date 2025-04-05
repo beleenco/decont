@@ -1,6 +1,5 @@
 #Download all the files specified in data/filenames
-mkdir -p data
-for url in $(list_of_urls) #TODO
+for url in $(cat data/urls)
 do
     bash scripts/download.sh $url data
 done
@@ -8,21 +7,14 @@ done
 # Download the contaminants fasta file, uncompress it, and
 # filter to remove all small nuclear RNAs
 mkdir -p res
-bash scripts/download.sh <contaminants_url> res yes #TODO
+bash scripts/download.sh https://bioinformatics.cnio.es/data/courses/decont/contaminants.fasta.gz res yes "small nuclear RNA" #TODO
 
 # Index the contaminants file
 mkdir -p res/contaminants_idx
 bash scripts/index.sh res/contaminants.fasta res/contaminants_idx
 
-# I create a list with the sample ids. Belen 2025-04-02 23.39 Not sure if we had to do this here
-for sample in data/*.gz; do
-    id=$(basename ${sample})
-    echo ${id%-12.5dpp*} 
-done | uniq > list_of_sample_ids
-
-
 # Merge all files from each sample
-for sid in $(list_of_sample_ids) #TODO
+for sid in $(ls data/*.fastq.gz | cut -d "-" -f1 | cut -d "/" -f2 | sort | uniq)
 do
     bash scripts/merge_fastqs.sh data out/merged $sid
 done
@@ -32,8 +24,8 @@ done
 #     -o <trimmed_file> <input_file> > <log_file>  
 echo "Running cutadapt..."
 mkdir -p log/cutadapt
-mkdir -p out/cutadapt
-for sid in $(<list_of_sample_ids>)
+mkdir -p out/trimmed
+for sid in $(ls data/*.fastq.gz | cut -d "-" -f1 | cut -d "/" -f2 | sort | uniq)
 do
     cutadapt \
         -m 18 \
