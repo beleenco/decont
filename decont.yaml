@@ -1,0 +1,9 @@
+name: linux
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - cutadapt
+  - star
+prefix: /home/belen/miniforge3/envs/linux
